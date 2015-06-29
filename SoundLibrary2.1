@@ -1,0 +1,192 @@
+#ifndef SOUND_H_
+#define SOUND_H_
+
+//All notes used in the songs are defined with the half of the period corresponding each note
+#define F1 5727
+#define G1 5102
+#define A1 4545
+#define AS1 4290
+#define C2 3822
+#define D2 3405
+#define DS2 3214
+#define E2 3034
+#define F2 2864
+#define FS2 2703
+#define G2 2551
+#define A2 2273
+#define ASH2 2145
+#define B2 2025
+#define C3 1911
+#define D3 1703
+#define E3 1517
+#define F3 1432
+#define G3 1276
+#define A3 1136
+
+
+uint16_t counter_cycles = 0; //Variable to count the times that every cycle of a note repeats
+
+//The five arrays are filled by "note,duration of note,time between notes". The two values of time are in miliseconds. Every array has a 999 as the last element 
+//in order to say to while function that it has ended.
+uint16_t Songoftime_notes[] = {A2,750,50,D2,1250,50,F2,750,50,A2,750,25,D2,1250,50,F2,750,50,
+	A2,250,50,C3,250,50,B2,500,50,G2,500,50,F2,250,25,G2,250,50,A2,500,50,D2,500,50,C2,250,50,E2,250,50,D2,2000,500,999};
+
+uint16_t Songofstorms_notes[] = {D2,100,80,F2,100,80,D3,200,250,D2,100,80,F2,100,80,D3,200,250,E3,200,50,F3,100,80,E3,100,80,F3,100,80,E3,100,80,C3,100,80,A2,100,300,
+	A2,200,100,D2,200,100,F2,100,100,G2,100,100,A2,100,500,A2,200,100,D2,200,100,F2,100,100,G2,100,100,E2,100,500,
+	D2,100,80,F2,100,80,D3,200,250,D2,100,80,F2,100,80,D3,200,250,E3,200,50,F3,100,80,E3,100,80,F3,100,80,E3,100,80,C3,100,80,A2,100,300,
+	A2,200,100,D2,200,100,F2,100,100,G2,100,100,A2,300,100,A2,200,100,D2,300,2000,999};
+
+uint16_t SuperMarioBros_notes[] = {E3,100,75,E3,100,75,E3,100,150,C3,100,150,E3,100,50,G3,100,150,G2,100,275,
+	C3,100,225,G2,100,225,E2,100,200,A2,100,250,B2,80,150,ASH2,50,50,A2,100,75,G2,100,150,E3,80,100,G3,50,100,A3,100,75,F3,80,150,G3,50,75,E3,80,175,C3,80,150,D3,80,75,B2,80,500,
+	C3,60,75,C3,80,150,C3,60,175,C3,80,75,D3,80,75,E3,80,75,C3,80,75,A2,80,162,G2,80,300,C3,60,75,C3,80,150,C3,60,175,C3,80,75,D3,80,125,E3,80,600,
+	C3,60,75,C3,80,150,C3,60,175,C3,80,75,D3,80,75,E3,80,75,C3,80,75,A2,80,162,G2,80,300,E3,60,75,E3,80,150,E3,60,175,C3,80,75,E3,80,175,G3,80,300,G2,80,600,
+	C3,100,225,G2,100,225,E2,100,200,A2,100,250,B2,80,150,ASH2,50,50,A2,100,75,G2,100,150,E3,80,100,G3,50,100,A3,100,75,F3,80,150,G3,50,75,E3,80,175,C3,80,150,D3,80,75,B2,80,500,999};
+
+uint16_t Bloodytears_notes[] = {G1,500,75,A1,500,75,AS1,500,75,A1,500,75,F1,500,75,A1,500,75,G1,500,500,G1,500,75,A1,500,75,AS1,500,75,C2,500,75,AS1,500,75,A1,500,75,G1,500,500,G1,500,75,A1,500,75,AS1,500,75,A1,500,75,F1,500,75,A1,500,75,G1,500,500,
+	G2,150,10,D2,150,10,D3,150,10,D2,150,10,C3,150,10,D2,150,10,ASH2,150,10,D2,150,10,A2,150,10,D2,150,10,ASH2,150,10,D2,150,10,A2,150,10,D2,150,10,G2,150,10,D2,150,10,A2,150,10,D2,150,10,ASH2,150,10,D2,150,10,C3,150,10,D2,150,10,ASH2,150,10,D2,150,10,A2,150,10,D2,150,10,F2,150,10,D2,150,10,A2,150,10,D2,150,10,G2,150,10,D2,150,10,G2,150,10,
+	D2,150,10,D3,150,10,D2,150,10,C3,150,10,D2,150,10,ASH2,150,10,D2,150,10,A2,150,10,D2,150,10,ASH2,150,10,D2,150,10,A2,150,10,D2,150,10,G2,150,10,D2,150,10,A2,150,10,D2,150,10,ASH2,150,10,D2,150,10,C3,150,10,D2,150,10,ASH2,150,10,D2,150,10,A2,150,10,D2,150,10,F2,150,10,D2,150,10,A2,150,10,D2,150,10,G2,150,10,D2,150,10,G2,150,10,
+	D2,150,10,D3,150,10,D2,150,10,C3,150,10,D2,150,10,ASH2,150,10,D2,150,10,A2,150,10,D2,150,10,ASH2,150,10,D2,150,10,A2,150,10,D2,150,10,G2,150,10,D2,150,10,A2,150,10,D2,150,10,ASH2,150,10,D2,150,10,C3,150,10,D2,150,10,ASH2,150,10,D2,150,10,A2,150,10,D2,150,10,F2,150,10,D2,150,10,A2,150,10,D2,150,10,G2,150,10,999};
+	
+uint16_t DonkeyKong_notes[] = {E2,150,150,G2,150,50,A2,150,50,G2,150,100,C2,150,350,E2,150,150,G2,150,50,A2,150,50,G2,150,100,C2,150,350,E2,150,150,G2,150,50,A2,150,50,G2,150,100,C2,150,350,E2,150,150,G2,150,50,A2,150,50,G2,150,100,C2,150,350,E2,150,150,G2,150,50,A2,150,50,G2,100,150,C2,150,350,E2,150,150,G2,150,50,A2,150,50,G2,100,150,
+	C2,500,50,D2,250,50,DS2,350,50,C2,250,250,F2,75,10,FS2,75,10,F2,75,10,FS2,75,10,F2,75,10,FS2,75,10,F2,75,10,FS2,75,10,F2,75,10,FS2,75,10,F2,75,10,FS2,75,10,F2,75,10,FS2,75,10,F2,75,10,FS2,75,10,999};
+
+uint8_t counter_notes = 0; //Variable used to count when a note is played in order to compare to a given value to turn on the LEDs
+uint16_t arr_count = 0; //Variable used to count the position in the array 
+
+
+int note_time (double note, double duration_ms);
+int Songoftime();
+int Songofstorms();
+int SuperMarioBros();
+int Bloodytears();
+int DonkeyKong();
+
+//****************************************************************************
+int note_time (double note, double duration_ms) //This function play a note. The values used as arguments are a note and its duration
+{
+	double duration_int = ((duration_ms*1000)/(note*2)); //The times that the for loop must be repeated in order to make a duration of certain amount of time
+														//is calculated
+	
+	for(counter_cycles=1; counter_cycles<=duration_int; counter_cycles++)	//This for takes the value of the variable duration_int and to generate the song
+	{																		//certain amount of time. The instructions inside for loop make a square wave
+		PORTC|=(1<<PC0); //High output
+		_delay_us(note); //Time output high
+		PORTC&=~(1<<PC0); //Low output
+		_delay_us(note);  //Time output low
+	}
+	return 0;
+}
+
+
+//*****************************************************************************
+int Songoftime() //This function plays a song 
+{	
+	while (Songoftime_notes[arr_count]!= 999)	//This while is active until is founded the value 999 in the array (end of the array)
+	{
+		note_time(Songoftime_notes[arr_count],Songoftime_notes[arr_count+1]); //Function note_time is called and the values in the array are read
+		arr_count=arr_count+2;		//The counter is incremented by 2
+		_delay_ms(Songoftime_notes[arr_count]);	 //Reads next position and take the value for a delay
+		arr_count++; //The counter is incremented by 1
+		counter_notes++; //The counter of notes played is incremented by one
+		if(counter_notes>=2) //Compares the value of the variable counter_notes in order to turn on the led to show the progress
+		{
+			PORTA=(PORTA*2)+1; //Is incremented the value of the PORTA to turn on the LEDs according to progress of song
+			counter_notes=0; //The counter is restarted in order to count again
+		}
+	}
+	PORTA = 0;		//The LEDs are turned off
+	counter_notes=0; //If there is a value different to 0 in the variable counter_notes, is assigned a 0
+	arr_count=0;	//The arr_count is restarted in order count again from the beginning in the next song
+	return 0;
+}
+
+//*****************************************************************************
+int Songofstorms()
+{	
+	while (Songofstorms_notes[arr_count]!= 999)
+	{
+		note_time(Songofstorms_notes[arr_count],Songofstorms_notes[arr_count+1]);
+		arr_count=arr_count+2;
+		_delay_ms(Songofstorms_notes[arr_count]);
+		arr_count++;
+		counter_notes++;
+		if(counter_notes>=5)
+		{
+			PORTA=(PORTA*2)+1;
+			counter_notes=0;
+		}
+	}
+	PORTA = 0;
+	counter_notes=0;
+	arr_count=0;		
+	return 0;
+}
+
+//*****************************************************************************
+int SuperMarioBros()
+{	
+	while (SuperMarioBros_notes[arr_count]!= 999)
+	{
+		note_time(SuperMarioBros_notes[arr_count],SuperMarioBros_notes[arr_count+1]);
+		arr_count=arr_count+2;
+		_delay_ms(SuperMarioBros_notes[arr_count]);
+		arr_count++;
+		counter_notes++;
+		if(counter_notes>=9)
+		{
+			PORTA=(PORTA*2)+1;
+			counter_notes=0;
+		}
+	}
+	PORTA = 0;
+	counter_notes=0;
+	arr_count=0;		
+	return 0;
+}
+
+
+//*****************************************************************************
+int Bloodytears()
+{	
+	while (Bloodytears_notes[arr_count]!= 999)
+	{
+		note_time(Bloodytears_notes[arr_count],Bloodytears_notes[arr_count+1]);
+		arr_count=arr_count+2;
+		_delay_ms(Bloodytears_notes[arr_count]);
+		arr_count++;
+		counter_notes++;
+		if(counter_notes>=9)
+		{
+			PORTA=(PORTA*2)+1;
+			counter_notes=0;
+		}
+	}
+	PORTA = 0;
+	counter_notes=0;
+	arr_count=0;		
+	return 0;
+}
+
+//*****************************************************************************
+int DonkeyKong()
+{	
+	while (DonkeyKong_notes[arr_count]!= 999)
+	{
+		note_time(DonkeyKong_notes[arr_count],DonkeyKong_notes[arr_count+1]);
+		arr_count=arr_count+2;
+		_delay_ms(DonkeyKong_notes[arr_count]);
+		arr_count++;
+		counter_notes++;
+		if(counter_notes>=6)
+		{
+			PORTA=(PORTA*2)+1;
+			counter_notes=0;
+		}
+	}
+	PORTA = 0;
+	counter_notes=0;
+	arr_count=0;		
+	return 0;
+}
+
+#endif /* SOUND_H_ */
