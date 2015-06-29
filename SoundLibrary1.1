@@ -1,0 +1,44 @@
+#ifndef SOUND_H_
+#define SOUND_H_
+
+
+#define F1 5727
+#define G1 5102
+#define A1 4545
+#define AS1 4290
+#define C2 3822
+#define D2 3405
+#define DS2 3214
+#define E2 3034
+#define F2 2864
+#define FS2 2703
+#define G2 2551
+#define A2 2273
+#define ASH2 2145
+#define B2 2025
+#define C3 1911
+#define D3 1703
+#define E3 1517
+#define F3 1432
+#define G3 1276
+#define A3 1136
+
+uint16_t counter_cycles = 0;
+
+int note_time (double note, double duration_ms);
+
+//****************************************************************************
+int note_time (double note, double duration_ms)
+{
+	double duration_int = ((duration_ms*1000)/(note*2));
+	for(counter_cycles=1; counter_cycles<=duration_int; counter_cycles++)
+	{
+		PORTC|=(1<<PC0);
+		_delay_us(note);
+		PORTC&=~(1<<PC0);
+		_delay_us(note);
+	}
+	return 0;
+}
+
+#endif /* SOUND_H_ */
