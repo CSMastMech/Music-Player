@@ -1,0 +1,54 @@
+// Atmega 32
+// Clock frequency 1Mhz
+//remote control processing - code
+
+#include <avr/io.h>
+
+
+
+
+
+
+
+
+// Set Time Counter Mode to Normal
+TCCR1A &= ~(1<<WGM10); 
+TCCR1A &= ~(1<<WGM11);
+TCCR1B &= ~(1<<WGM12); 
+TCCR1B &= ~(1<<WGM13); 
+
+//Input Capture detecting the rising edge
+TCCR1B |= (1 << ICES1);
+
+// Setting the prescaler to 8
+TCCR1B |=  (1<<CS11);
+
+// Disable Input Capture Interrupt
+TIMSK |= (1<<TICIE1);
+
+// Setting PORTD as Input
+DDRD = 0;
+
+// Disable internal PULLUP of the Input Capture Pin
+PORTD &= ~(1<<PORTD6);
+
+
+
+
+int main(void){
+while(1){}
+
+
+  return 0;
+}
+
+
+
+
+
+
+
+
+     
+                   
+
