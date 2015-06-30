@@ -1,0 +1,682 @@
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#define __DELAY_BACKWARD_COMPATIBLE__
+#include <util/delay.h>
+#include "lcd.h"
+#define F_CPU 1000000UL
+#include "sound.h"
+
+uint8_t pause=0,repr=0;
+uint8_t bandera2=0;
+volatile uint16_t rem_instr = 0;
+
+uint16_t counter_delay = 0;
+uint8_t var_work = 0;
+
+uint16_t Start=0;
+volatile uint16_t Stop = 0;
+uint16_t time_diff = 0;
+uint16_t difference_storage[24];
+uint8_t capture_count=0;
+volatile uint16_t bandera = 0;
+
+volatile int8_t s=0,curs=0;
+uint8_t on=0;
+
+uint8_t counter_notes = 0;
+uint16_t arr_count = 0; 
+
+// void botonazo(){
+// 	
+// 	if(!(PINC & 0b00000001))
+// 	{
+// 		while(!(PINC & 0b00000001));
+// 		rem_instr=66;
+// 		bandera=1;
+// 		
+// 		if (rem_instr==64 && repr==1)
+// 		pause=1;
+// 		else if ((rem_instr==67 || rem_instr==68 || rem_instr==74 || rem_instr==66) && repr==1)
+// 		bandera2=1;
+// }
+// 
+// 	if(!(PINC & 0b00000010))
+// 	{
+// 		while(!(PINC & 0b00000010));
+// 		rem_instr=67;
+// 		bandera=1;
+// 		
+// 		if (rem_instr==64 && repr==1)
+// 		pause=1;
+// 		else if ((rem_instr==67 || rem_instr==68 || rem_instr==74 || rem_instr==66) && repr==1)
+// 		bandera2=1;
+// 	}
+// 	
+// 	if(!(PINC & 0b00000100))
+// 	{
+// 		while(!(PINC & 0b00000100));
+// 		rem_instr=68;
+// 		bandera=1;
+// 		
+// 		if (rem_instr==64 && repr==1)
+// 		pause=1;
+// 		else if ((rem_instr==67 || rem_instr==68 || rem_instr==74 || rem_instr==66) && repr==1)
+// 		bandera2=1;
+// 	}
+// 	
+// 	if(!(PINC & 0b00001000))
+// 	{
+// 		while(!(PINC & 0b00001000));
+// 		rem_instr=64;
+// 		bandera=1;
+// 	
+// 	if (rem_instr==64 && repr==1)
+// 	pause=1;
+// 	else if ((rem_instr==67 || rem_instr==68 || rem_instr==74 || rem_instr==66) && repr==1)
+// 	bandera2=1;
+// 	
+// 	}
+// 
+// }
+
+//*****************************************************************************
+int Songoftime()
+{	
+	repr=1;
+	while (Songoftime_notes[arr_count]!= 999 && pause==0 && bandera2==0)
+	{
+		note_time(Songoftime_notes[arr_count],Songoftime_notes[arr_count+1]);
+		arr_count=arr_count+2;
+		_delay_ms(Songoftime_notes[arr_count]);
+		arr_count++;
+		counter_notes++;
+//		if(counter_notes>=2)
+// 		{
+// 			PORTA=(PORTA*2)+1;
+// 			counter_notes=0;
+// 		}
+	}
+	
+	switch(rem_instr){
+		
+		case 67:
+		nextbut();
+		break;
+		
+		case 68:
+		prevbut();
+		break;
+		
+		case 74:
+		stop();
+		break;
+		
+		case 66:
+		on=0;
+		PORTA=0;
+		arr_count=0;
+		lcd_clrscr();
+		PORTB &= (0<<PB7);
+		_delay_ms(500);
+		break;
+		
+	}
+	
+	
+	if (pause==0 && bandera2==0)
+	{
+		arr_count=0;
+		PORTA = 0;
+		counter_notes=0;
+		Playlist();
+	}
+	
+	bandera2=0;
+	return 0;
+}
+
+
+int Songofstorms()
+ {	
+	 repr=1;
+ 	while (Songofstorms_notes[arr_count]!= 999 && pause==0 && bandera2==0)
+ 	{
+ 		note_time(Songofstorms_notes[arr_count],Songofstorms_notes[arr_count+1]);
+ 		arr_count=arr_count+2;
+ 		_delay_ms(Songofstorms_notes[arr_count]);
+ 		arr_count++;
+ 		counter_notes++;
+ 		if(counter_notes>=5)
+ 		{
+ 			PORTA=(PORTA*2)+1;
+ 			counter_notes=0;
+ 		}
+ 	}
+
+switch(rem_instr){
+	
+	case 67:
+	nextbut();
+	break;
+	
+	case 68:
+	prevbut();
+	break;
+	
+	case 74:
+	stop();
+	break;
+	
+	case 66:
+	on=0;
+	PORTA=0;
+	arr_count=0;
+	lcd_clrscr();
+	PORTB &= (0<<PB7);
+	_delay_ms(500);
+	break;
+}
+
+if (pause==0 && bandera2==0)
+{
+	arr_count=0;
+	PORTA = 0;
+	counter_notes=0;
+	Playlist();
+}
+
+bandera2=0;
+return 0;
+}
+ 
+ //*****************************************************************************
+ int SuperMarioBros()
+ {	
+	 repr=1;
+ 	while (SuperMarioBros_notes[arr_count]!= 999 && pause==0 && bandera2==0)
+ 	{
+ 		note_time(SuperMarioBros_notes[arr_count],SuperMarioBros_notes[arr_count+1]);
+ 		arr_count=arr_count+2;
+ 		_delay_ms(SuperMarioBros_notes[arr_count]);
+ 		arr_count++;
+ 		counter_notes++;
+ 		if(counter_notes>=9)
+ 		{
+ 			PORTA=(PORTA*2)+1;
+ 			counter_notes=0;
+ 		}
+ 	}
+
+switch(rem_instr){
+	
+	case 67:
+	nextbut();
+	break;
+	
+	case 68:
+	prevbut();
+	break;
+	
+	case 74:
+	stop();
+	break;
+	
+	case 66:
+	on=0;
+	PORTA=0;
+	arr_count=0;
+	lcd_clrscr();
+	PORTB &= (0<<PB7);
+	_delay_ms(500);
+	break;
+}
+
+
+if (pause==0 && bandera2==0)
+{
+	arr_count=0;
+	PORTA = 0;
+	counter_notes=0;
+	Playlist();
+}
+
+bandera2=0;
+return 0;
+}
+ 
+ //*****************************************************************************
+ int Bloodytears()
+ {	
+	 repr=1;
+ 	while (Bloodytears_notes[arr_count]!= 999 && pause==0 && bandera2==0)
+ 	{
+ 		note_time(Bloodytears_notes[arr_count],Bloodytears_notes[arr_count+1]);
+ 		arr_count=arr_count+2;
+ 		_delay_ms(Bloodytears_notes[arr_count]);
+ 		arr_count++;
+ 		counter_notes++;
+ 		if(counter_notes>=14)
+ 		{
+ 			PORTA=(PORTA*2)+1;
+ 			counter_notes=0;
+ 		}
+ 	}
+ 	
+	 switch(rem_instr){
+		 
+		 case 67:
+		 nextbut();
+		 break;
+		 
+		 case 68:
+		 prevbut();
+		 break;
+		 
+		 case 74:
+		 stop();
+		 break;
+		 
+		 case 66:
+		 on=0;
+		 PORTA=0;
+		 arr_count=0;
+		 lcd_clrscr();
+		 PORTB &= (0<<PB7);
+		 _delay_ms(500);
+		 break;
+	 }
+	 
+	 
+	 if (pause==0 && bandera2==0)
+	 {
+		 arr_count=0;
+		 PORTA = 0;
+		 counter_notes=0;
+		 Playlist();
+	 }
+	 
+	 bandera2=0;
+	 return 0;
+ }
+ 
+ //*****************************************************************************
+ int DonkeyKong()
+ {	
+	 repr=1;
+ 	while (DonkeyKong_notes[arr_count]!= 999 && pause==0 && bandera2==0)
+ 	{
+ 		note_time(DonkeyKong_notes[arr_count],DonkeyKong_notes[arr_count+1]);
+ 		arr_count=arr_count+2;
+ 		_delay_ms(DonkeyKong_notes[arr_count]);
+ 		arr_count++;
+ 		counter_notes++;
+ 		if(counter_notes>=6)
+ 		{
+			PORTA=(PORTA*2)+1;
+ 			counter_notes=0;
+ 		}
+ 	}
+ 	
+	 switch(rem_instr){
+		 
+		 case 67:
+		 nextbut();
+		 break;
+		 
+		 case 68:
+		 prevbut();
+		 break;
+		 
+		 case 74:
+		 stop();
+		 break;
+		 
+		 case 66:
+		 on=0;
+		 PORTA=0;
+		 arr_count=0;
+		 lcd_clrscr();
+		 PORTB &= (0<<PB7);
+		 _delay_ms(500);
+		 break;
+	 }
+	 
+	 
+	 if (pause==0 && bandera2==0)
+	 {
+		 arr_count=0;
+		 PORTA = 0;
+		 counter_notes=0;
+		 Playlist();
+	 }
+	 
+	 bandera2=0;
+	 return 0;
+ }
+
+
+void welcomemessage(){
+	PORTB |= (1<<PB7);
+	s=0;
+	curs=0;
+	rem_instr=0;
+	lcd_gotoxy(2,0);
+	lcd_puts("Welcome");
+	_delay_ms(1000);
+	lcd_clrscr();
+	_delay_ms(300);
+	Playlist();
+	bandera=0;
+	
+}
+
+void stop(){
+	_delay_ms(50);
+	bandera=0;
+	s=0;
+	curs=0;
+	Playlist();
+	PORTA = 0;
+	arr_count=0;
+}
+
+void prevbut(){
+	s--;
+	
+	if(s<=0)
+	s=0;
+	
+	if (s%2 == 0)
+	curs=0;
+	else
+	curs=1;
+	
+	Playlist();
+	
+	PORTA = 0;
+	arr_count=0;
+	bandera=0;
+}
+
+ void nextbut(){
+	
+	s++;
+	
+	if(s>=4)
+	s=4;
+	
+	if (s%2 == 0)
+	curs=0;
+	else
+	curs=1;
+	
+	PORTA = 0;
+	arr_count=0;
+		
+	Playlist();
+	
+	bandera=0;
+ }
+
+void Playlist(){
+	
+		lcd_clrscr();
+		lcd_gotoxy(0,curs);
+		lcd_puts("->");
+	
+	if (s<=1)
+	{	
+		lcd_gotoxy(2,0);
+		lcd_puts("Song of Time");
+		lcd_gotoxy(2,1);
+		lcd_puts("Song of Storms");
+	}
+	
+	if (s>=2 && s<=3)
+	{	
+		lcd_gotoxy(2,0);
+		lcd_puts("Super Mario Bros");
+		lcd_gotoxy(2,1);
+		lcd_puts("Bloody Tears");
+	}
+	
+	if (s==4)
+	{	
+		lcd_gotoxy(2,0);
+		lcd_puts("Donkey Kong");
+	}
+	
+}
+
+void ok(){
+	
+	bandera=0;
+	lcd_clrscr();
+	
+	switch (s){
+		
+		case 0:
+		lcd_gotoxy(2,0);
+		lcd_puts("Song of Time");
+		lcd_gotoxy(2,1);
+		lcd_puts("Zelda");
+		Songoftime();
+		break;
+		
+		case 1:
+		lcd_gotoxy(2,0);
+		lcd_puts("Song of Storms");
+		lcd_gotoxy(2,1);
+		lcd_puts("Zelda");
+		Songofstorms();
+		break;
+		
+		case 2:
+		lcd_gotoxy(2,0);
+		lcd_puts("Main Theme");
+		lcd_gotoxy(2,1);
+		lcd_puts("Super Mario Bros");
+		SuperMarioBros();
+		break;
+		
+		case 3:
+		lcd_gotoxy(2,0);
+		lcd_puts("Bloddy Tears");
+		lcd_gotoxy(2,1);
+		lcd_puts("Castlevania");
+		Bloodytears();
+		break;
+		
+		case 4:
+		lcd_gotoxy(2,0);
+		lcd_puts("Main Theme");
+		lcd_gotoxy(2,1);
+		lcd_puts("Donkey Kong");
+		DonkeyKong();
+		break;
+		
+	}
+	
+	pause=0;
+	repr=0;
+}
+
+void InitBoard(void){
+	// Output: LEDs at port C
+	//DDRC = 0b11111111;
+	// switch off all LEDs
+	
+	//Output: LEDs at port A
+	
+	DDRC = 0xFF;
+	
+	DDRD=0b00000000;
+	PORTD=0xFF;
+	
+	DDRA = 0xFF;
+	
+	DDRB = 0xFF;
+}
+
+
+int main(void)
+{
+	
+	MCUCR |=  (1<ISC10);
+
+	// Set Time Counter Mode to Normal
+	TCCR1A &= ~(1<<WGM10);
+	TCCR1A &= ~(1<<WGM11);
+	TCCR1B &= ~(1<<WGM12);
+	TCCR1B &= ~(1<<WGM13);
+
+	//Input Capture detecting the rising edge
+	TCCR1B |= (1 << ICES1);
+
+	// Setting the prescaler to 8
+	TCCR1B |=  (1<<CS11);
+
+	// Disable Input Capture Interrupt
+	TIMSK |= (1<<TICIE1);
+
+	// Setting PORTD as Input
+	//DDRD=0;
+
+	// Disable internal PULLUP of the Input Capture Pin
+	//PORTB |= (1<<PB0);
+	//DDRB =0;
+	
+	GICR = 1<<INT0;
+	MCUCR= 1<<ISC00;
+
+	
+	sei();// enable interrupts
+	
+	InitBoard();
+	lcd_init(LCD_DISP_ON);
+	
+	while(1){
+		
+		
+		if (rem_instr==66){
+			on=1;
+			welcomemessage();
+		}
+		
+		while (on==1)
+		{
+			
+			switch (rem_instr)
+			{
+				case 67:
+				pause=0;
+				
+				if(bandera==1)
+				nextbut();
+				
+				rem_instr=0;
+				break;
+				
+				case 68:
+				pause=0;
+				if(bandera==1)
+				prevbut();
+				rem_instr=0;
+				bandera=0;
+				break;
+				
+				case 74:
+				pause=0;
+				if(bandera==1)
+				stop();
+				rem_instr=0;
+				bandera=0;
+				break;
+				
+				case 66:
+				pause=0;
+				rem_instr=0;
+				PORTA = 0;
+				arr_count=0;	
+				if(bandera==1)
+				on=0;
+				lcd_clrscr();
+				PORTB &= (0<<PB7);
+				_delay_ms(500);
+				bandera=0;
+				break;
+				
+				case 64:	
+				if(bandera==1)
+				ok();
+				rem_instr=0;
+				bandera=0;
+				break;
+			
+			}
+			
+		}
+	}
+}
+
+ISR(INT0_vect){
+	
+	rem_instr=66;
+	bandera=1;
+	
+	else if ((rem_instr==67 || rem_instr==68 || rem_instr==74 || rem_instr==66) && repr==1)
+	bandera2=1;
+	
+	_delay_ms(300);
+		
+}
+
+ISR(TIMER1_CAPT_vect){
+	
+	//Calculating the time between two rising edges
+	Start = ICR1; 	//Timestamp of the first rising edge
+	time_diff = Start-Stop; // Time between two rising edges
+	Stop = ICR1; // Storing the timestamp of the first rising edge
+	
+	if(time_diff<=300 && bandera == 0){ //filtering only important times
+
+		capture_count++; //Counting the input captures
+
+		if(capture_count<26){ //getting the first 25 important numbers
+			difference_storage[capture_count-1]=time_diff;
+		}
+		else{ //processing the difference_storage array
+			rem_instr=0; // setting the instruction to zero
+			for(uint8_t help_count=16; help_count<24;help_count++){ // deciding if it is a zero or one
+				if(difference_storage[help_count]>200){
+					rem_instr |= (1<<(help_count-16));
+				}
+				else{
+					rem_instr &= ~(1<<(help_count-16));
+				}
+			}
+			
+			
+			
+			if(rem_instr==67 || rem_instr==68 || rem_instr==74 || rem_instr==66 || rem_instr==64)
+			bandera=1;
+			
+			if (rem_instr==64 && repr==1)
+			pause=1;
+			else if ((rem_instr==67 || rem_instr==68 || rem_instr==74 || rem_instr==66) && repr==1)
+			bandera2=1;
+			
+			capture_count = 0;
+			
+			_delay_ms(500);
+		}
+	}
+	
+}
+
+// rem_instr values
+// ok = 64
+// next =  67
+// previous = 68
+// on/off =66
+// stop = 74
