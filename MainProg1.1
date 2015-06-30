@@ -1,0 +1,252 @@
+
+//ATMEGA32
+// 1MHz Frequency
+
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#define __DELAY_BACKWARD_COMPATIBLE__
+#include <util/delay.h>
+#include "lcd.h"
+#include "Sound.h"
+#define F_CPU 1000000UL
+
+uint16_t counter_delay = 0;
+int var_work = 0;
+
+uint16_t Start=0;
+volatile uint16_t Stop = 0;
+uint16_t time_diff = 0;
+uint16_t difference_storage[24];
+uint8_t capture_count=0;
+volatile uint16_t rem_instr = 0;
+volatile uint16_t bandera = 0;
+
+int s=0,curs=0;
+int on=0,status=0;
+int pause=0;
+
+
+void welcomemessage(){
+	s=0;
+	curs=0;
+	rem_instr=0;
+	lcd_gotoxy(2,0);
+	lcd_puts("Welcome");
+	_delay_ms(1000);
+	lcd_clrscr();
+	_delay_ms(300);
+	Playlist();
+	bandera=0;
+}
+
+void stop(){
+	_delay_ms(50);
+	bandera=0;
+	s=0;
+	curs=0;
+	Playlist();
+}
+
+void prevbut(){
+	_delay_ms(200);
+	s--;
+	
+	if(s<0)
+	s=0;
+	
+	if (s%2 == 0)
+	curs=0;
+	else
+	curs=1;
+	
+	Playlist();
+	bandera=0;
+}
+
+void nextbut(){
+	_delay_ms(200);
+	s++;
+	
+	if(s>=4)
+	s=3;
+	
+	if (s%2 == 0)
+	curs=0;
+	else
+	curs=1;
+	
+	Playlist();
+	bandera=0;
+}
+
+void Playlist(){
+	
+	lcd_clrscr();
+	lcd_gotoxy(0,curs);
+	lcd_puts("->");
+	
+	if (s<2)
+	{
+		lcd_gotoxy(2,0);
+		lcd_puts("Song 1");
+		lcd_gotoxy(2,1);
+		lcd_puts("Song 2");
+	}
+	
+	if (s>=2 && s<=4)
+	{
+		lcd_gotoxy(2,0);
+		lcd_puts("Song 3");
+		lcd_gotoxy(2,1);
+		lcd_puts("Song 4");
+	}
+}
+
+void ok(){
+	_delay_ms(100);
+	bandera=0;
+	songn1();
+	rem_instr=0;
+}
+
+void InitBoard(void){
+	// Output: LEDs at port C
+	DDRC = 0b11111111;
+	// switch off all LEDs
+	
+	//Output: LEDs at port A
+	DDRA = 0b11111111;
+}
+
+
+int main(void)
+{
+
+	// Set Time Counter Mode to Normal
+	TCCR1A &= ~(1<<WGM10);
+	TCCR1A &= ~(1<<WGM11);
+	TCCR1B &= ~(1<<WGM12);
+	TCCR1B &= ~(1<<WGM13);
+
+	//Input Capture detecting the rising edge
+	TCCR1B |= (1 << ICES1);
+
+	// Setting the prescaler to 8
+	TCCR1B |=  (1<<CS11);
+
+	// Disable Input Capture Interrupt
+	TIMSK |= (1<<TICIE1);
+
+	// Setting PORTD as Input
+	DDRD=0;
+
+	// Disable internal PULLUP of the Input Capture Pin
+	//PORTB |= (1<<PB0);
+	DDRB =0;
+	
+	sei();// enable interrupts
+	
+	InitBoard();
+	lcd_init(LCD_DISP_ON_CURSOR);
+	
+	while(1){
+		
+		_delay_ms(100);
+		
+		if (rem_instr==66){
+			on=1;
+			welcomemessage();
+		}
+		
+		while (on==1)
+		{
+			
+			switch (rem_instr)
+			{
+				
+				case 67:
+				pause=0;
+				if(bandera==1)
+				nextbut();
+				break;
+				
+				case 68:
+				pause=0;
+				if(bandera==1)
+				prevbut();
+				break;
+				
+				case 74:
+				pause=0;
+				if(bandera==1)
+				stop();
+				break;
+				
+				case 66:
+				pause=0;
+				if(bandera==1)
+				on=0;
+				lcd_clrscr();
+				_delay_ms(100);
+				break;
+				
+				case 64:
+				pause=1;
+				if(bandera==1)
+				ok();
+				rem_instr=0;
+				bandera=0;
+				break;
+				
+				default:
+				
+				break;
+				
+			}
+			
+		}
+	}
+}
+
+//while(!(PINA & 4));
+
+ISR(TIMER1_CAPT_vect){
+	//Calculating the time between two rising edges
+	Start = ICR1; 	//Timestamp of the first rising edge
+	time_diff = Start-Stop; // Time between two rising edges
+	Stop = ICR1; // Storing the timestamp of the first rising edge
+	
+	
+	if(time_diff<=300 && bandera == 0){ //filtering only important times
+
+		capture_count++; //Counting the input captures
+
+		if(capture_count<26){ //getting the first 25 important numbers
+			difference_storage[capture_count-1]=time_diff;
+		}
+		else{ //processing the difference_storage array
+			rem_instr=0; // setting the instruction to zero
+			for(uint8_t help_count=16; help_count<24;help_count++){ // deciding if it is a zero or one
+				if(difference_storage[help_count]>200){
+					rem_instr |= (1<<(help_count-16));
+				}
+				else{
+					rem_instr &= ~(1<<(help_count-16));
+				}
+			}
+
+			capture_count = 0;
+			
+			
+			bandera=1;
+		}
+	}
+	
+}
+
+// rem_instr values
+// ok = 64
+// next =  67
+// previous = 68
+// on/off =66
+// stop = 74
